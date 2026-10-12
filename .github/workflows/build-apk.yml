@@ -1,0 +1,47 @@
+
+name: Build Carrera al Vacio APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar Carrera al Vacio
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar Carrera al Vacio
+        uses: actions/checkout@v4
+
+      - name: Instalar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Crear estructura Android
+        run: flutter create --platforms=android --project-name carrera_al_vacio .
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Verificar codigo
+        run: flutter analyze
+
+      - name: Compilar APK
+        run: flutter build apk --release
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Carrera-al-Vacio-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
